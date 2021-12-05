@@ -1,27 +1,25 @@
 defmodule Sayuri.Consumer do
   require Logger
-  alias Nosedrum.Invoker.Split, as: CommandHandle
-  alias Nosedrum.Storage.ETS, as: CommandStorage
-  alias Sayuri.Commands
   use Nostrum.Consumer
 
-  @commands %{
-    "ed" => Commands.Ed
-  }
+  def start_link, do: Consumer.start_link(__MODULE__)
 
-  def start_link do
-    Consumer.start_link(__MODULE__)
+  def handle_event({:READY, _data, _ws_stare}) do
+    case Nosedrum.Interactor.Dispatcher.add_command(
+           "echo",
+           Sayuri.Commands.Echo,
+           :global
+         ) do
+      {:ok, _} -> IO.puts("Registered Echo command.")
+      e -> IO.inspect(e, label: "An error occurred registering the Echo command")
+    end
   end
 
-  def handle_event({:READY, _data, _ws_state}) do
-    Enum.each(@commands, fn {nome, cmd} -> CommandStorage.add_command([nome], cmd) end)
+  def handle_event({:INTERACTION_CREATE, interaction, _ws_state}) do
+    Nosedrum.Interactor.Dispatcher.handle_interaction(interaction)
   end
 
-  def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
-    CommandHandle.handle_message(msg, CommandStorage)
-  end
-
-  def handle_event({event, _content, _ws}) do
-    Logger.log(:warning, "Evento não tratado: #{Atom.to_string(event)}")
+  def handle_event(event) do
+    Logger.log(:warning, "Evento não tratado: #{inspect(event)}")
   end
 end
