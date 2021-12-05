@@ -9,7 +9,7 @@ defmodule Sayuri do
       {Nosedrum.Interactor.Dispatcher, name: Nosedrum.Interactor.Dispatcher}
     ]
 
-    options = [strategy: :rest_for_one, name: Sayuri.Supervisor]
+    options = [strategy: :one_for_one, name: Sayuri.Supervisor]
     Supervisor.start_link(childrens, options)
   end
 end

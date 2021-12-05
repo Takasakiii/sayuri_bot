@@ -7,9 +7,13 @@ defmodule Sayuri.Modules.Consumer do
   def start_link, do: Consumer.start_link(__MODULE__)
 
   def handle_event({:READY, _data, _ws_stare}) do
-    Task.Supervisor.start_child(Sayuri.TaskSupervisor, fn ->
-      Sayuri.Modules.Status.status_task()
-    end)
+    Task.Supervisor.start_child(
+      Sayuri.TaskSupervisor,
+      fn ->
+        Sayuri.Modules.Status.status_task()
+      end,
+      restart: :transient
+    )
 
     case Nosedrum.Interactor.Dispatcher.add_command(
            "echo",
