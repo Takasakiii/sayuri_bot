@@ -7,7 +7,7 @@ defmodule Sayuri.Modules.Status do
     item = Enum.at(@status, position)
     Api.update_status(:online, item, 1)
 
-    Process.sleep(7000)
+    Process.sleep(10000)
 
     if position >= length(@status) do
       status_task(0)
