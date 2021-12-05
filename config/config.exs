@@ -6,5 +6,5 @@ config :nostrum,
 config :porcelain,
   driver: Porcelain.Driver.Basic
 
-config :sayuri,
+config :nosedrum,
   prefix: "."

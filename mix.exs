@@ -25,7 +25,8 @@ defmodule Sayuri.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:nostrum, "~> 0.4"}
+      {:nostrum, "~> 0.4"},
+      {:nosedrum, "~> 0.4"}
     ]
   end
 end

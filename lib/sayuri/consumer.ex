@@ -1,28 +1,27 @@
 defmodule Sayuri.Consumer do
+  require Logger
+  alias Nosedrum.Invoker.Split, as: CommandHandle
+  alias Nosedrum.Storage.ETS, as: CommandStorage
+  alias Sayuri.Commands
   use Nostrum.Consumer
 
-  alias Nostrum.Api
+  @commands %{
+    "ed" => Commands.Ed
+  }
 
   def start_link do
     Consumer.start_link(__MODULE__)
   end
 
+  def handle_event({:READY, _data, _ws_state}) do
+    Enum.each(@commands, fn {nome, cmd} -> CommandStorage.add_command([nome], cmd) end)
+  end
+
   def handle_event({:MESSAGE_CREATE, msg, _ws_state}) do
-    prefix = Application.fetch_env!(:sayuri, :prefix)
-    msg_text = msg.content
-
-    if String.starts_with?(msg_text, prefix) do
-      msg_text = String.slice(msg_text, 1..String.length(msg_text))
-
-      case msg_text do
-        "shiba" -> Api.create_message!(msg.channel_id, "gay")
-        "takasaki" -> Api.create_message!(msg.channel_id, "viado")
-        _ -> :ignore
-      end
-    end
+    CommandHandle.handle_message(msg, CommandStorage)
   end
 
   def handle_event({event, _content, _ws}) do
-    IO.puts("Evento não tratado: #{Atom.to_string(event)}")
+    Logger.log(:warning, "Evento não tratado: #{Atom.to_string(event)}")
   end
 end
