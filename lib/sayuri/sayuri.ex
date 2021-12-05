@@ -4,7 +4,8 @@ defmodule Sayuri do
   @impl true
   def start(_type, _args) do
     childrens = [
-      {Sayuri.Consumer, name: Sayuri.Consumer},
+      {Task.Supervisor, name: Sayuri.TaskSupervisor},
+      Sayuri.Modules.Consumer,
       {Nosedrum.Interactor.Dispatcher, name: Nosedrum.Interactor.Dispatcher}
     ]
 
