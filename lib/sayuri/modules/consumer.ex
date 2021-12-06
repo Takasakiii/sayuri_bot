@@ -3,6 +3,7 @@ defmodule Sayuri.Modules.Consumer do
   use Nostrum.Consumer
 
   alias Sayuri.Commands
+  alias Sayuri.Modules.HandleForms
 
   def start_link, do: Consumer.start_link(__MODULE__)
 
@@ -23,10 +24,23 @@ defmodule Sayuri.Modules.Consumer do
       {:ok, _} -> Logger.log(:info, "Registered Echo command.")
       e -> Logger.log(:error, "Failed to register Echo command: #{e}")
     end
+
+    case Nosedrum.Interactor.Dispatcher.add_command("counter", Commands.Counter, :global) do
+      {:ok, _} -> Logger.log(:info, "Registered Counter command.")
+      e -> Logger.log(:error, "Failed to register Counter command: #{e}")
+    end
   end
 
   def handle_event({:INTERACTION_CREATE, interaction, _ws_state}) do
-    Nosedrum.Interactor.Dispatcher.handle_interaction(interaction)
+    if interaction.type == 2 do
+      Nosedrum.Interactor.Dispatcher.handle_interaction(interaction)
+    else
+      id = interaction.data.custom_id
+
+      unless !id do
+        HandleForms.call(id, interaction)
+      end
+    end
   end
 
   def handle_event({status, _data, _ws}) do

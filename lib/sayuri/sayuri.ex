@@ -5,6 +5,7 @@ defmodule Sayuri do
   def start(_type, _args) do
     childrens = [
       {Task.Supervisor, name: Sayuri.TaskSupervisor},
+      Sayuri.Modules.HandleForms,
       Sayuri.Modules.Consumer,
       {Nosedrum.Interactor.Dispatcher, name: Nosedrum.Interactor.Dispatcher}
     ]
