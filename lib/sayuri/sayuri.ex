@@ -6,11 +6,12 @@ defmodule Sayuri do
     childrens = [
       {Task.Supervisor, name: Sayuri.TaskSupervisor},
       Sayuri.Modules.HandleForms,
+      Sayuri.Modules.HandleFormsEts,
       Sayuri.Modules.Consumer,
       {Nosedrum.Interactor.Dispatcher, name: Nosedrum.Interactor.Dispatcher}
     ]
 
-    options = [strategy: :one_for_one, name: Sayuri.Supervisor]
+    options = [strategy: :one_for_all, name: Sayuri.Supervisor]
     Supervisor.start_link(childrens, options)
   end
 end

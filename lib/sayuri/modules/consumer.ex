@@ -39,6 +39,7 @@ defmodule Sayuri.Modules.Consumer do
 
       unless !id do
         HandleForms.call(id, interaction)
+        Sayuri.Modules.HandleFormsEts.call_form(id, interaction)
       end
     end
   end

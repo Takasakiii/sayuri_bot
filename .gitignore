@@ -27,3 +27,4 @@ sayuri-*.tar
 /tmp
 
 /.elixir_ls
+handle_forms_ets

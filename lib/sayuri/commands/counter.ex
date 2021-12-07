@@ -1,18 +1,18 @@
 defmodule Sayuri.Commands.Counter do
   @behaviour Nosedrum.ApplicationCommand
 
-  alias Sayuri.Modules.HandleForms
+  alias Sayuri.Modules.HandleFormsEts
   alias Nostrum.Api
 
   @impl true
   def description, do: "Cria um botão inutil que quando clica ele add + 1"
 
-  def callback(it) do
+  def callback(it, {old_id, counter}) do
     new_id = Integer.to_string(it.id)
-    {counter, _} = Integer.parse(Enum.at(String.split(it.data.custom_id, "-"), 1))
     n_counter = counter + 1
 
-    HandleForms.handle("#{new_id}-#{n_counter}", &callback/1)
+    HandleFormsEts.add_form(new_id, {new_id, n_counter}, &callback/2)
+    HandleFormsEts.delete_form(old_id)
 
     Api.create_interaction_response(it, %{
       type: 7,
@@ -25,8 +25,8 @@ defmodule Sayuri.Commands.Counter do
               %{
                 type: 2,
                 style: 1,
-                custom_id: "#{new_id}-#{n_counter}",
-                label: "#{n_counter}"
+                custom_id: new_id,
+                label: n_counter
               }
             ]
           }
@@ -38,8 +38,8 @@ defmodule Sayuri.Commands.Counter do
   @impl true
   def command(interaction) do
     id = interaction.id
-
-    HandleForms.handle("#{id}-0", &callback/1)
+    id = Integer.to_string(id)
+    HandleFormsEts.add_form(id, {id, 0}, &callback/2)
 
     [
       content: "grande dia",
@@ -50,7 +50,7 @@ defmodule Sayuri.Commands.Counter do
             %{
               type: 2,
               style: 1,
-              custom_id: "#{id}-0",
+              custom_id: id,
               label: "0"
             }
           ]
